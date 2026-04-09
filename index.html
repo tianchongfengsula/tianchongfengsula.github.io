@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>填充冯·苏拉 — Portfolio</title>
+
+  <!-- Tailwind (Play CDN - 生产用工具子集) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind 配置：字体与颜色扩展
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ukiyoe: {
+              50: '#fffaf6',
+              100: '#f7efe6',
+              200: '#efdbc8',
+              500: '#b5523b',
+              700: '#7b3727'
+            }
+          },
+          fontFamily: {
+            serif: ['Noto Serif SC', 'serif'],
+            ui: ['Noto Sans SC', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- 谷歌字体（Noto Serif & Noto Sans SC） -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.156.0/build/three.min.js"></script>
+
+  <style>
+    /* 纸张纹理与日本风格装饰 */
+    html,body,#app { height: 100%; }
+    body {
+      background: linear-gradient(180deg,#fffafa 0%, #fff8f2 60%);
+      font-family: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: #2b2b2b;
+    }
+
+    /* 细微纸张颗粒 SVG 数据 URL */
+    :root {
+      --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='g'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.03' fill='%23b5523b'/%3E%3C/svg%3E");
+    }
+    .paper {
+      background-image: var(--grain);
+      background-blend-mode: multiply;
+    }
+
+    .crest {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.2)), linear-gradient(180deg,#b5523b,#7b3727);
+      box-shadow: 0 4px 18px rgba(123,55,39,0.15);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      font-family: "Noto Serif SC", serif;
+      font-size:18px;
+      transform: rotate(-6deg);
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,250,246,0.9));
+      border: 1px solid rgba(123,55,39,0.06);
+      box-shadow: 0 6px 30px rgba(43,43,43,0.06);
+      border-radius: 12px;
+    }
+
+    /* Three.js 画布覆盖全屏作为背景 */
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #main {
+      position: relative;
+      z-index: 10;
+    }
+
+    .accent-line {
+      height: 2px;
+      width: 72px;
+      background: linear-gradient(90deg,#b5523b,#7b3727);
+      border-radius: 2px;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-title { font-size: 3.25rem; line-height: 1; }
+      .hero-sub { font-size: 1.125rem; }
+    }
+    @media (max-width: 640px) {
+      .crest { width:56px; height:56px; font-size:16px; }
+    }
+  </style>
+</head>
+<body class="paper">
+
+<canvas id="bgCanvas"></canvas>
+
+<div id="app" class="min-h-screen flex items-center justify-center px-6">
+  <main id="main" class="w-full max-w-5xl">
+    <!-- 头部 -->
+    <header class="flex items-center gap-6 mb-8">
+      <div class="crest">填</div>
+      <div>
+        <div class="text-sm text-ukiyoe-700 font-serif">填充冯·苏拉</div>
+        <div class="text-xs text-gray-500">传统 · 当代 · 设计</div>
+      </div>
+      <nav class="ml-auto hidden sm:flex gap-4 text-sm">
+        <a href="#work" class="text-gray-700 hover:text-ukiyoe-700">作品</a>
+        <a href="#about" class="text-gray-700 hover:text-ukiyoe-700">关于</a>
+        <a href="#contact" class="text-gray-700 hover:text-ukiyoe-700">联系</a>
+      </nav>
+    </header>
+
+    <!-- 英雄区 -->
+    <section class="mb-10 grid lg:grid-cols-2 gap-8 items-center">
+      <div class="space-y-4">
+        <h1 class="hero-title font-serif text-4xl text-ukiyoe-700">填充冯·苏拉</h1>
+        <p class="hero-sub text-gray-700 max-w-xl">传统日本美学与现代视觉设计的结合：版画、排版与网站界面，专注于幽玄、余白与质感。</p>
+        <div class="flex items-center gap-4 mt-4">
+          <a href="#work" class="px-5 py-2 card text-sm font-medium text-white" style="background:linear-gradient(90deg,#b5523b,#7b3727)">查看作品</a>
+          <a href="#about" class="px-5 py-2 card text-sm font-medium text-ukiyoe-700 border border-transparent hover:border-ukiyoe-200">更多</a>
+        </div>
+        <div class="mt-6">
+          <div class="accent-line mb-2"></div>
+          <p class="text-xs text-gray-500">Selected: 木版画 / 海报 / 室内视觉</p>
+        </div>
+      </div>
+
+      <!-- 关于卡片，已更新为中文并包含你的简历信息 -->
+      <aside class="card p-6">
+        <h3 class="font-serif text-2xl text-ukiyoe-700 mb-2">关于我</h3>
+        <p class="text-sm text-gray-700 mb-4">
+          我是在北京的前端开发工程师，主要使用 React 构建应用；今年计划改用 Dioxus 开发 Web 应用。我的工作关注点是把细致的视觉与良好的交互结合，重视可维护性与性能优化。
+        </p>
+        <ul class="text-sm text-gray-600 space-y-2">
+          <li><strong>专长：</strong>前端工程、React、组件化、性能优化</li>
+          <li><strong>近期技术：</strong>计划迁移到 Dioxus（Rust + WebAssembly）用于 Web 应用开发</li>
+          <li><strong>地点：</strong>北京 · 远程合作</li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- 作品集 -->
+    <section id="work" class="mb-12">
+      <h2 class="font-serif text-2xl text-ukiyoe-700 mb-4">作品集</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <figure class="card overflow-hidden">
+          <div class="h-44 bg-cover bg-center" style="background-image:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder');"></div>
+          <figcaption class="p-4">
+            <h3 class="font-serif text-lg text-ukiyoe-700">木版：朝雾</h3>
+            <p class="text-sm text-gray-600 mt-1">使用手工雕刻，着墨保留纸张质感。</p>
+          </figcaption>
+        </figure>
+        <figure class="card overflow-hidden">
+          <div class="h-44 bg-cover bg-center" style="background-image:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)), url('https://images.unsplash.com/photo-1549887534-80d7b6f1a2a6?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder');"></div>
+          <figcaption class="p-4">
+            <h3 class="font-serif text-lg text-ukiyoe-700">海报：夜行</h3>
+            <p class="text-sm text-gray-600 mt-1">以留白与单色墨色为主，简约构图。</p>
+          </figcaption>
+        </figure>
+        <figure class="card overflow-hidden">
+          <div class="h-44 bg-cover bg-center" style="background-image:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)), url('https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder');"></div>
+          <figcaption class="p-4">
+            <h3 class="font-serif text-lg text-ukiyoe-700">品牌视觉：庭院</h3>
+            <p class="text-sm text-gray-600 mt-1">物料与纹样延展，含名片与包装系统。</p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 关于与联系 -->
+    <section id="about" class="mb-12 grid md:grid-cols-3 gap-6">
+      <div class="md:col-span-2 card p-6">
+        <h3 class="font-serif text-xl text-ukiyoe-700 mb-2">理念</h3>
+        <p class="text-gray-700 text-sm">我的工作在静与动之间寻找平衡：尊重传统工艺的偶然与瑕疵，同时使用数字工具在屏幕上呈现纸张的质感。项目包含品牌系统、海报、展览视觉与限量印刷品。</p>
+        <ul class="mt-4 text-sm text-gray-600 space-y-2">
+          <li><strong>流程：</strong>研究 — 草图 — 刻版/数字制作 — 打样 — 最终交付</li>
+          <li><strong>交付物：</strong>高分辨率印刷文件、可替换纹样、色彩指南</li>
+        </ul>
+      </div>
+
+      <aside id="contact" class="card p-6">
+        <h3 class="font-serif text-xl text-ukiyoe-700 mb-2">联系</h3>
+        <p class="text-sm text-gray-700 mb-4">欢迎通过以下方式联系：项目询价、合作、技术交流。</p>
+        <div class="text-sm text-gray-600 space-y-2">
+          <div><strong>邮箱：</strong>your.email@example.com</div>
+          <div><strong>地点：</strong>北京</div>
+          <div><strong>可合作形式：</strong>远程 · 现场 · 兼职咨询</div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="text-center text-xs text-gray-500 py-6">
+      © <span id="year"></span> 填充冯·苏拉 — 保留所有权利
+    </footer>
+  </main>
+</div>
+
+<script>
+  // 设置页面年份
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Three.js 动态背景：漂浮的纸张平面
+  (function () {
+    const canvas = document.getElementById('bgCanvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+
+    // 相机设置
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
+    camera.position.z = 80;
+
+    // 环境光
+    const ambient = new THREE.HemisphereLight(0xffffff, 0x888888, 0.9);
+    scene.add(ambient);
+
+    // 创建带纹理的纸张平面（使用 canvas 生成纹理）
+    function makePaperTexture(tint = '#f8efe6', stroke = '#b5523b') {
+      const size = 512;
+      const c = document.createElement('canvas');
+      c.width = c.height = size;
+      const ctx = c.getContext('2d');
+
+      // 底色
+      ctx.fillStyle = tint;
+      ctx.fillRect(0,0,size,size);
+
+      // 手绘风格线条
+      ctx.strokeStyle = stroke;
+      ctx.globalAlpha = 0.06;
+      for (let i=0;i<18;i++){
+        ctx.beginPath();
+        ctx.moveTo(0, (i+1)*24 + Math.random()*6);
+        ctx.lineTo(size, (i+1)*24 + Math.random()*6);
+        ctx.stroke();
+      }
+
+      // 细小颗粒
+      ctx.fillStyle = stroke;
+      for (let i=0;i<200;i++){
+        if(Math.random() > 0.97) ctx.fillRect(Math.random()*size, Math.random()*size, 1, 1);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      return tex;
+    }
+
+    const geom = new THREE.PlaneGeometry(28, 18, 1, 1);
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const count = 12;
+    for (let i=0;i<count;i++){
+      const mat = new THREE.MeshBasicMaterial({
+        map: makePaperTexture(),
+        transparent: true,
+        opacity: 0.98,
+        side: THREE.DoubleSide
+      });
+      const m = new THREE.Mesh(geom, mat);
+      m.position.x = (Math.random()-0.5)*140;
+      m.position.y = (Math.random()-0.5)*80;
+      m.position.z = -Math.random()*200;
+      m.rotation.z = (Math.random()-0.5)*0.6;
+      m.rotation.x = (Math.random()-0.5)*0.4;
+      m.userData.speed = 0.02 + Math.random()*0.06;
+      m.scale.setScalar(0.6 + Math.random()*0.9);
+      group.add(m);
+    }
+
+    // 轻微渐晕覆盖
+    const overlayGeom = new THREE.PlaneGeometry(2*window.innerWidth, 2*window.innerHeight);
+    const overlayMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.02 });
+    const overlay = new THREE.Mesh(overlayGeom, overlayMat);
+    overlay.position.z = -300;
+    scene.add(overlay);
+
+    // 窗口尺寸变化处理
+    function onResize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w,h);
+      camera.aspect = w/h;
+      camera.updateProjectionMatrix();
+      overlay.geometry.dispose();
+      overlay.geometry = new THREE.PlaneGeometry(2*w, 2*h);
+    }
+    window.addEventListener('resize', onResize, { passive: true });
+    onResize();
+
+    let last = 0;
+    // 动画循环
+    function animate(t) {
+      const dt = (t - last) * 0.001;
+      last = t;
+      // 平面向相机缓慢移动
+      group.children.forEach((m, idx) => {
+        m.position.z += m.userData.speed * dt * 60;
+        m.rotation.z += 0.0008 * (idx%2?1:-1);
+        m.position.x += Math.sin(t*0.0002 + idx) * 0.02;
+        if (m.position.z > 50) {
+          m.position.z = -250 - Math.random()*200;
+          m.position.x = (Math.random()-0.5)*140;
+          m.position.y = (Math.random()-0.5)*80;
+        }
+      });
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // 鼠标视差效果
+    let mx = 0, my = 0;
+    window.addEventListener('mousemove', (e) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * -2;
+      mx = nx; my = ny;
+      camera.position.x += (mx*6 - camera.position.x) * 0.08;
+      camera.position.y += (my*4 - camera.position.y) * 0.08;
+      camera.lookAt(0,0,0);
+    }, { passive: true });
+
+  })();
+</script>
